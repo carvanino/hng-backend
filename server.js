@@ -34,7 +34,7 @@ const makeAPIRequest = async () => {
         const responseData = requestResponse.data;
 
         const response = {
-            status: responseStatus,
+            status: responseStatus === 200 ? "success" : responseStatus,
             user: {
                 email: EMAIL,
                 name: NAME,
@@ -46,7 +46,7 @@ const makeAPIRequest = async () => {
         return response;
     } catch (err) {
         return {
-            status: 502,
+            status: "error",
             message: "Failed to fetch data from external API"
         };
     }
@@ -61,7 +61,7 @@ app.get("/", async (req, res) => {
 
 app.get("/me", async (req, res) => {
     const response = await makeAPIRequest()
-    if (response.status === 200) {
+    if (response.status === 'success') {
         res.status(200).send(response);
         return;
     }
