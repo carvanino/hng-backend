@@ -1,4 +1,4 @@
-# DevOps Stage 0 – Express API
+# Backend Stage 0 – Express API
 
 A simple Node.js/Express server that fetches data from an external API and returns user-specific information, built for the HNGx DevOps Stage 0 challenge.
 
