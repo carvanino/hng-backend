@@ -44,7 +44,7 @@ npm install
 PORT=80
 BASE_URL=https://catfact.ninja/fact
 NAME=Oluwatofunmi Akinola
-EMAIL=your-email@example.com
+EMAIL=akinolatofunmi.tech@gmail.com
 ```
 
 ### 4. Start the server
