@@ -39,8 +39,6 @@ function hashSha256(text) {
 }
 
 const charFrquencyMap = (str) => {
-  console.log("STRING -> ", str);
-  console.log(countBy(str));
   return countBy(str);
 }
 
@@ -57,10 +55,7 @@ const getStringProps = (stringToBeAnalysed) => {
 }
 
 app.post("/strings", (req, res) => {
-  console.log(req);
   const requestBody = req.body;
-
-  console.log("REQ ->", requestBody);
 
   const string = requestBody?.value;
 
@@ -216,8 +211,6 @@ app.get("/strings/filter-by-natural-language", (req, res) => {
   }
 
   const filters = parseQueryNLP(nlpQuery);
-
-  console.log("FILTERS -> ", filters);
 
   const filteredData = filterString(filters);
 
