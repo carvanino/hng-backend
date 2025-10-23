@@ -85,7 +85,7 @@ app.post("/strings", (req, res) => {
   return;
 });
 
-app.get("/string/:string_value", (req, res) => {
+app.get("/strings/:string_value", (req, res) => {
   const string = req.params.string_value;
 
   const stringData = find(DATABASE, (data) => data.value === string);
@@ -95,7 +95,7 @@ app.get("/string/:string_value", (req, res) => {
   return res.status(200).send(stringData);
 });
 
-function filterString(params) {
+function filterString(params = {}) {
   let {
     is_palindrome,
     min_length,
@@ -103,9 +103,10 @@ function filterString(params) {
     word_count,
     contains_character
   } = params;
+
   if (is_palindrome) {
     if (is_palindrome !== 'true' && is_palindrome !== 'false') {
-      return res.status(400).send("is_palindrome must be 'true' or 'false'")
+      return "is_palindrome must be 'true' or 'false'"
     }
     is_palindrome = is_palindrome === 'true';
   }
@@ -113,66 +114,65 @@ function filterString(params) {
   if (min_length) {
     min_length = parseInt(min_length, 10);
     if (isNaN(min_length) || min_length < 0) {
-      return res.status(400).send("min_length must be a non-negative integer");
+      return "min_length must be a non-negative integer";
     }
   }
 
   if (max_length) {
     max_length = parseInt(max_length, 10);
     if (isNaN(max_length) || max_length < 0) {
-      return res.status(400).send("max_length must be a non-negative integer");
+      return "max_length must be a non-negative integer";
     }
   }
 
   if (word_count) {
     word_count = parseInt(word_count, 10);
     if (isNaN(word_count) || word_count < 0) {
-      return res.status(400).send("word_count must be a non-negative integer");
+      return "word_count must be a non-negative integer";
     }
   }
 
   if (contains_character) {
     if (typeof contains_character !== "string" || contains_character.length > 1) {
-      return res.status(400).send("contains_character must be a single character");
+      return "contains_character must be a single character";
     }
   }
 
-  const filteredData = filter(DATABASE, (data) => {
-    if (is_palindrome && data.is_palindrome !== is_palindrome) {
+  return filter(DATABASE, (data) => {
+    const props = data.properties;
+
+    if (is_palindrome && props.is_palindrome !== is_palindrome) {
       return false;
     }
 
-    if (min_length && data.length < min_length) {
+    if (min_length && props.length < min_length) {
       return false;
     }
 
-    if (max_length && data.length > max_length) {
+    if (max_length && props.length > max_length) {
       return false;
     }
 
-    if (word_count && data.word_count < word_count) {
+    if (word_count && props.word_count !== word_count) {
       return false;
     }
 
-    if (contains_character && !includes(data.value, contains_character)) {
+    if (contains_character && !includes(data.value.toLowerCase(), contains_character.toLowerCase())) {
       return false;
     }
+
     return true;
-  })
+  });
 }
 
 app.get("/strings", (req, res) => {
-  let {
-    is_palindrome,
-    min_length,
-    max_length,
-    word_count,
-    contains_character
-  } = req.query;
-
   const params = req.query;
 
   const filteredData = filterString(params);
+
+  if (typeof filteredData === "string") {
+    return res.status(400).send(filteredData);
+  }
 
   const response = {
     data: filteredData,
@@ -214,6 +214,10 @@ app.get("/strings/filter-by-natural-language", (req, res) => {
 
   const filteredData = filterString(filters);
 
+  if (typeof filteredData === "string") {
+    return res.status(400).send(filteredData);
+  }
+
   const response = {
     data: filteredData,
     count: filteredData.length,
@@ -228,7 +232,7 @@ app.get("/strings/filter-by-natural-language", (req, res) => {
   return res.status(200).send(response);
 });
 
-app.delete("/string/:string_value", (req, res) => {
+app.delete("/strings/:string_value", (req, res) => {
   const string = req.params.string_value.toLowerCase();
 
   const stringToDel = find(DATABASE, (data) => data.value.toLowerCase() === string);
