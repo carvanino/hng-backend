@@ -1,0 +1,18 @@
+{
+  "name": "hng-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node gateway.js",
+    "dev": "concurrently --kill-others-on-fail --names \"STAGE-0,STAGE-1,GATEWAY\" -c \"cyan,magenta,green\" \"cd stage-0 && npm start\" \"cd stage-1 && npm start\" \"npm start\"",
+    "dev:gateway": "node gateway.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.0",
+    "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
