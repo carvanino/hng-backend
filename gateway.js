@@ -38,6 +38,18 @@ app.use('/stage-1', createProxyMiddleware({
   }
 }));
 
+app.use('/stage-2', createProxyMiddleware({
+  target: 'http://localhost:3003',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/stage-2': '', // Remove /stage-1 prefix when forwarding
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for stage-2:', err.message);
+    res.status(502).json({ error: 'stage-2 server unavailable' });
+  }
+}));
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -54,4 +66,5 @@ app.listen(PORT, () => {
   console.log(`Gateway server running on http://localhost:${PORT}`);
   console.log(`Stage-0 accessible at http://localhost:${PORT}/stage-0`);
   console.log(`Stage-1 accessible at http://localhost:${PORT}/stage-1`);
+  console.log(`Stage-2 accessible at http://localhost:${PORT}/stage-2`);
 });
