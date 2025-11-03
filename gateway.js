@@ -38,6 +38,19 @@ app.use('/stage-1', createProxyMiddleware({
   }
 }));
 
+// Proxy to stage-3 server (Flask/Python)
+app.use('/stage-3', createProxyMiddleware({
+  target: 'http://localhost:8020',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/stage-3': '', // Remove /stage-3 prefix when forwarding
+  },
+  onError: (err, req, res) => {
+    console.error('Proxy error for stage-3:', err.message);
+    res.status(502).json({ error: 'stage-3 server unavailable' });
+  }
+}));
+
 app.use('/stage-2', createProxyMiddleware({
   target: 'http://localhost:3003',
   changeOrigin: true,
@@ -57,6 +70,7 @@ app.get('/', (req, res) => {
     endpoints: {
       'stage-0': '/stage-0',
       'stage-1': '/stage-1',
+      'stage-3': '/stage-3',
       'health': '/health'
     }
   });
@@ -66,5 +80,6 @@ app.listen(PORT, () => {
   console.log(`Gateway server running on http://localhost:${PORT}`);
   console.log(`Stage-0 accessible at http://localhost:${PORT}/stage-0`);
   console.log(`Stage-1 accessible at http://localhost:${PORT}/stage-1`);
+  console.log(`Stage-3 accessible at http://localhost:${PORT}/stage-3`);
   console.log(`Stage-2 accessible at http://localhost:${PORT}/stage-2`);
 });

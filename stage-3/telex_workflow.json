@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "budget_tracker_agent",
+      "name": "Budget Tracker Agent",
+      "type": "a2a/generic-a2a-node",
+      "typeVersion": 1,
+      "url": "https://dffec538518c.ngrok-free.app/a2a/agent",
+      "parameters": {},
+      "position": [
+        400,
+        300
+      ]
+    }
+  ],
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -4,7 +4,11 @@
   "type": "module",
   "scripts": {
     "start": "node gateway.js",
-    "dev": "concurrently --kill-others-on-fail --names \"STAGE-0,STAGE-1,STAGE-2,GATEWAY\" -c \"cyan,magenta,green\" \"cd stage-0 && npm start\" \"cd stage-1 && npm start\" \"cd stage-2 && npm start\" \"npm start\"",
+    "start:stage-0": "cd stage-0 && npm start",
+    "start:stage-1": "cd stage-1 && npm start",
+    "start:stage-2": "cd stage-2 && npm start",
+    "start:stage-3": "cd stage-3 && python3 main.py",
+    "dev": "bash dev.sh",
     "dev:gateway": "node gateway.js"
   },
   "dependencies": {
