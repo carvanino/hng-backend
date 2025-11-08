@@ -6,6 +6,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +33,25 @@ class GmailMonitor:
         """
         # This query looks for unread emails containing common financial keywords.
         # It can be customized further for specific bank alert formats.
+        today = datetime.utcnow()
+
+        first_day = today.replace(day=1)
+        next_month = ''
+        if today.month == 12:
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month + 1, day=1)
+
+        after = first_day.strftime("after:%Y/%m/%d")
+        before = next_month.strftime("before:%Y/%m/%d")
+
         query = (
             'is:unread in:inbox '
             '(subject:transaction OR '
             'subject:"Transfer" OR '
-            'subject:"credit alert")'
+            'subject:"credit alert") '
+            f'{after} {before}'
         )
-
-        
-        logger.info(f"Searching for transaction emails with query: {query}")
         
         try:
             # Use the existing search_messages functionality
