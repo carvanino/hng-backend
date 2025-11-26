@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  push_tokens              PushToken[]
+  notification_preferences NotificationPreference?
+
+  @@map("users")
+}
+
+model PushToken {
+  id          String   @id @default(uuid())
+  user_id     String
+  token       String   @unique
+  device_type String // ios, android, web
+  created_at  DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("push_tokens")
+}
+
+model NotificationPreference {
+  id                 String   @id @default(uuid())
+  user_id            String   @unique
+  email_enabled      Boolean  @default(true)
+  push_enabled       Boolean  @default(true)
+  frequency          String   @default("instant") // instant, daily, weekly
+  quiet_hours_start  Int?     // 0-23 (hour of day)
+  quiet_hours_end    Int?     // 0-23 (hour of day)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model Notification {
+  id                String   @id @default(uuid())
+  user_id           String
+  type              String   // email, push
+  status            String   @default("pending") // pending, sent, failed, delivered
+  template_id       String?
+  recipient         String   // email address or device token
+  subject           String?  // for email
+  content           String
+  metadata          Json?    // additional data
+  error_message     String?
+  sent_at           DateTime?
+  delivered_at      DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@index([user_id])
+  @@index([status])
+  @@map("notifications")
+}
+
+model Template {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  type        String   // email, push
+  subject     String?  // for email templates
+  body        String
+  variables   Json     // array of required variables e.g. ["name", "amount"]
+  language    String   @default("en")
+  version     Int      @default(1)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([type])
+  @@index([is_active])
+  @@map("templates")
+}
